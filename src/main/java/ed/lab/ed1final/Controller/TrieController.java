@@ -42,7 +42,6 @@ public class TrieController {
         return ResponseEntity.noContent().build();
     }
 
-    // Clases auxiliares para respuestas JSON
     record WordCountResponse(String word, int wordsEqualTo) {}
     record PrefixCountResponse(String prefix, int wordsStartingWith) {}
 }

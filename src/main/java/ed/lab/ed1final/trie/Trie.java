@@ -1,72 +1,95 @@
 package ed.lab.ed1final.trie;
-
 import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 @Component
 public class Trie {
 
-    private class TrieNode {
+    private static class TrieNode {
         Map<Character, TrieNode> children = new HashMap<>();
-        int wordCount = 0;
         int prefixCount = 0;
+        int wordCount = 0;
     }
 
-    private final TrieNode root;
+    private TrieNode root;
 
     public Trie() {
-        root = new TrieNode();
+        this.root = new TrieNode();
     }
 
     public void insert(String word) {
-        TrieNode node = root;
-        for (char ch : word.toCharArray()) {
-            node.prefixCount++;
-            node = node.children.computeIfAbsent(ch, c -> new TrieNode());
+        if (word == null || word.isEmpty()) return;
+
+        word = word.trim().toLowerCase();  // Normalización
+        TrieNode current = root;
+        current.prefixCount++;
+
+        for (char c : word.toCharArray()) {
+            current = current.children.computeIfAbsent(c, k -> new TrieNode());
+            current.prefixCount++;
         }
-        node.prefixCount++;
-        node.wordCount++;
+        current.wordCount++;
     }
 
     public int countWordsEqualTo(String word) {
-        TrieNode node = root;
-        for (char ch : word.toCharArray()) {
-            if (!node.children.containsKey(ch)) {
-                return 0;
-            }
-            node = node.children.get(ch);
+        if (word == null || word.isEmpty()) return 0;
+
+        word = word.trim().toLowerCase();
+        TrieNode current = root;
+
+        for (char c : word.toCharArray()) {
+            current = current.children.get(c);
+            if (current == null) return 0;
         }
-        return node.wordCount;
+        return current.wordCount;
     }
 
+
     public int countWordsStartingWith(String prefix) {
-        TrieNode node = root;
-        for (char ch : prefix.toCharArray()) {
-            if (!node.children.containsKey(ch)) {
-                return 0;
-            }
-            node = node.children.get(ch);
+        if (prefix == null || prefix.isEmpty()) return 0;
+
+        prefix = prefix.trim().toLowerCase();
+        TrieNode current = root;
+
+        for (char c : prefix.toCharArray()) {
+            current = current.children.get(c);
+            if (current == null) return 0;
         }
-        return node.prefixCount;
+        return current.prefixCount;
     }
 
     public void erase(String word) {
-        if (countWordsEqualTo(word) == 0) return; // No hay nada que borrar
+        if (word == null || word.isEmpty() || countWordsEqualTo(word) == 0) return;
 
-        TrieNode node = root;
-        for (char ch : word.toCharArray()) {
-            node.prefixCount--;
-            node = node.children.get(ch);
+        word = word.trim().toLowerCase();
+        TrieNode current = root;
+        current.prefixCount--;
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            TrieNode child = current.children.get(c);
+
+            if (child.prefixCount == 1) {
+                current.children.remove(c);
+                return;
+            }
+
+            child.prefixCount--;
+            current = child;
         }
-        node.prefixCount--;
-        node.wordCount--;
+
+        current.wordCount--;
+    }
+
+    public boolean isEmpty() {
+        return root.prefixCount == 0;
+    }
+
+    public void clear() {
+        root.children.clear();
+        root.prefixCount = 0;
+        root.wordCount = 0;
     }
 }
-
-
-
-
 
 
