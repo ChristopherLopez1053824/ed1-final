@@ -1,4 +1,5 @@
 package ed.lab.ed1final.Controller;
+
 import ed.lab.ed1final.trie.Trie;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
